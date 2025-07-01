@@ -1,0 +1,10 @@
+<h1>Delete Collection: {{ collection.name }}</h1>
+
+<p>Are you sure you want to delete this collection? <strong>This will delete all products in this collection.</strong>
+</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Yes, Delete</button>
+    <a href="{% url 'admin_add_collection' %}">Cancel</a>
+</form>

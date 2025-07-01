@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Admin Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            min-height: 100vh;
+            background: #f4f4f4;
+            flex-direction: row;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 220px;
+            background-color: #2c3e50;
+            color: white;
+            padding-top: 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: transform 0.3s ease-in-out;
+            z-index: 1000;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            color: #ecf0f1;
+            margin-bottom: 30px;
+            font-weight: 700;
+            font-size: 1.6rem;
+        }
+
+        .sidebar h2 a {
+            color: #ecf0f1;
+            text-decoration: none;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px 20px;
+            color: white;
+            text-decoration: none;
+            transition: background 0.3s;
+            font-weight: 600;
+        }
+
+        .sidebar a:hover {
+            background-color: #34495e;
+        }
+
+        /* Main content */
+        .main-content {
+            margin-left: 220px;
+            padding: 20px;
+            flex-grow: 1;
+            background-color: #f4f4f4;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+            font-weight: 700;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            table-layout: fixed;
+            word-wrap: break-word;
+        }
+
+        th,
+        td {
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+
+        th {
+            background-color: #eee;
+            font-weight: 700;
+        }
+
+        a.button {
+            padding: 6px 12px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-right: 5px;
+            display: inline-block;
+            font-size: 0.9rem;
+            transition: background 0.3s;
+        }
+
+        a.button:hover {
+            background: #0056b3;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1024px) {
+            body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+                display: flex;
+                flex-wrap: wrap;
+                padding: 10px 0;
+                justify-content: center;
+                overflow: visible;
+            }
+
+            .sidebar h2 {
+                width: 100%;
+                margin-bottom: 15px;
+                font-size: 1.4rem;
+            }
+
+            .sidebar a {
+                padding: 10px 15px;
+                flex: 1 1 33%;
+                text-align: center;
+                border-right: 1px solid #34495e;
+                border-bottom: 1px solid #34495e;
+            }
+
+            .sidebar a:nth-child(3n) {
+                border-right: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 15px 10px 30px;
+            }
+
+            .section {
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 768px) {
+
+            /* Tables scroll horizontally */
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            th,
+            td {
+                white-space: nowrap;
+            }
+
+            .sidebar a {
+                flex: 1 1 50%;
+                border-right: 1px solid #34495e;
+            }
+
+            .sidebar a:nth-child(2n) {
+                border-right: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar a {
+                flex: 1 1 100%;
+                border-right: none;
+                border-bottom: 1px solid #34495e;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            h2 {
+                font-size: 1.2rem;
+            }
+
+            a.button {
+                font-size: 0.85rem;
+                padding: 5px 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <h2>
+            <a href="{% url 'admin_dashboard' %}">Admin Panel</a>
+        </h2>
+
+        <a href="/admin/">Default Admin</a>
+        <a href="{% url 'admin_add_collection' %}">Manage Collection</a>
+        <a href="{% url 'admin_add_product' %}">Add Product</a>
+        <a href="{% url 'user_logout' %}">Logout</a>
+    </div>
+
+    <div class="main-content">
+        <h1>Welcome, Admin</h1>
+
+        <div class="section">
+            <h2>All Products</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Description</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.price }}</td>
+                        <td>{{ product.description|truncatechars:50 }}</td>
+                        <td>
+                            <a href="{% url 'admin_edit_product' product.id %}" class="button">Edit</a>
+                            <a href="{% url 'admin_delete_product' product.id %}" class="button"
+                                onclick="return confirm('Delete this product?');">Delete</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="text-align:center; color:#777;">No products found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>All Users</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Is Staff</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.first_name }} {{ user.last_name }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.is_staff }}</td>
+                        <td>
+                            {% if not user.is_superuser %}
+                            <a href="{% url 'admin_delete_user' user.id %}" class="button"
+                                onclick="return confirm('Delete user {{ user.username }}?');">Delete</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align:center; color:#777;">No users found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>All Orders</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Full Name</th>
+                        <th>Address</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Order Date</th>
+                        <th>Delivery Date</th>
+                        <th>Items</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ order.user.username }}</td>
+                        <td>{{ order.user.first_name }} {{ order.user.last_name }}</td>
+                        <td>
+                            {% if order.delivery_address %}
+                            {{ order.delivery_address.address }},
+                            {{ order.delivery_address.city }},
+                            {{ order.delivery_address.state }} -
+                            {{ order.delivery_address.pincode }}<br />
+                            {{ order.delivery_address.phone }}
+                            {% else %}
+                            <em>No address available</em>
+                            {% endif %}
+                        </td>
+                        <td>${{ order.total }}</td>
+                        <td>{{ order.status }}</td>
+                        <td>{{ order.date }}</td>
+                        <td>{{ order.delivery_date }}</td>
+                        <td>
+                            <ul style="padding-left: 15px; margin:0;">
+                                {% for item in order.items.all %}
+                                <li>{{ item.product.name }} (x{{ item.quantity }}) - ₹{{ item.price }}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td>
+                            <a href="{% url 'admin_update_order_status' order.id %}" class="button">Update</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" style="text-align:center; color:#777;">No orders found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Contact Messages</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Message</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in contacts %}
+                    <tr>
+                        <td>{{ c.name }}</td>
+                        <td>{{ c.email }}</td>
+                        <td>{{ c.message|truncatechars:80 }}</td>
+                        <td>
+                            <a href="{% url 'admin_delete_contact' c.id %}" class="button"
+                                onclick="return confirm('Delete this message?');">Delete</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="text-align:center; color:#777;">No messages found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>

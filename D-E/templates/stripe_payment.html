@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Stripe Payment</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f4f4;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 5vh auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        p {
+            text-align: center;
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 25px;
+        }
+
+        #payment-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        #card-element {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: #fafafa;
+        }
+
+        #submit-button {
+            background-color: #6772e5;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #submit-button:hover {
+            background-color: #5469d4;
+        }
+
+        #payment-message {
+            text-align: center;
+            font-size: 14px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 2vh 10px;
+                padding: 20px;
+            }
+
+            h2 {
+                font-size: 24px;
+            }
+
+            p {
+                font-size: 16px;
+            }
+
+            #submit-button {
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Complete Your Payment</h2>
+        <p>Total Amount: ${{ total_amount }}</p>
+
+        <form id="payment-form">
+            <div id="card-element">
+                <!-- Stripe Card Input will be rendered here -->
+            </div>
+            <button type="submit" id="submit-button">Pay with Stripe</button>
+            <p id="payment-message" style="color: red;"></p>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            const stripe = Stripe("{{ stripe_publishable_key }}");
+            const clientSecret = "{{ client_secret }}";
+
+            if (!clientSecret) {
+                document.getElementById("payment-message").textContent = "Client Secret not received.";
+                return;
+            }
+
+            const elements = stripe.elements();
+            const cardElement = elements.create("card");
+            cardElement.mount("#card-element");
+
+            const form = document.getElementById("payment-form");
+            const paymentMessage = document.getElementById("payment-message");
+
+            form.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                paymentMessage.textContent = ""; // Clear old messages
+
+                const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+                    payment_method: {
+                        card: cardElement,
+                    },
+                });
+
+                if (error) {
+                    paymentMessage.textContent = `Payment failed: ${error.message}`;
+                } else if (paymentIntent.status === "succeeded") {
+                    paymentMessage.textContent = "Payment successful! Redirecting...";
+                    setTimeout(() => {
+                        window.location.href = "{% url 'place_order' %}";
+                    }, 1500);
+                } else {
+                    paymentMessage.textContent = "Something went wrong. Please try again.";
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>
